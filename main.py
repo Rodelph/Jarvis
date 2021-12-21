@@ -1,10 +1,12 @@
 import pyttsx3 as jarv
 import datetime
 import speech_recognition as sr
+import pywhatkit as kit
 
 engine = jarv.init()
-#voices = engine.getProperty('voices')
-#engine.setProperty('voice', voices[1].id)
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[0].id)
+r = sr.Recognizer()
 
 def speak(audio):
     engine.say(audio)
@@ -26,11 +28,28 @@ def morningGreeting():
     time()
     speak("and the current day is")
     date()
-    speak("Do you need anything sir ?")
+    speak("Do you need anything Sir ?")
 
+def playMusic(audioMusic):
+    kit.playonyt(audioMusic)
+
+def voiceMusic():
+ with sr.Microphone() as sourceMusic :
+                speak("What type of music Sir ?")
+                print("Recognizing song name...")
+                r.pause_threshold = 1
+                audioMusic = r.listen(sourceMusic)
+                try :
+                    queryMusic = str(r.recognize_google(audioMusic, language="en-UK"))
+                    print(queryMusic)
+                    playMusic(queryMusic)
+                except Exception as e:
+                    print(e)
+                    speak("Couldn't hear the song name  Sir !")
+                    voiceMusic()
 
 def recog():
-    r = sr.Recognizer()
+
     with sr.Microphone() as source :
         print("Listening...")
         r.pause_threshold = 1
@@ -38,16 +57,24 @@ def recog():
 
     try :
         print("Recognizing...")
-        query = r.recognize_google(audio, language="fr-FR")
-        if query == "date":
+        query = str(r.recognize_google(audio, language="en-UK"))
+        print(query)
+        if query.lower() == "what's today's date" or query.lower() == "what is today's date" :
             date()
+
+        if query.lower() == "play music":
+            voiceMusic()
+
+        if query.lower() == "hello jarvis":
+            morningGreeting()
 
     except Exception as e:
         print(e)
-        speak("Couldn't understand what you meant sir !")
+        speak("Couldn't understand what you meant Sir !")
         recog()
 
         return "None"
     return query
 
-recog()
+if __name__ == "__main__":
+    recog()
