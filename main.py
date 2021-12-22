@@ -30,26 +30,22 @@ def morningGreeting():
     date()
     speak("Do you need anything Sir ?")
 
-def playMusic(audioMusic):
-    kit.playonyt(audioMusic)
-
 def voiceMusic():
  with sr.Microphone() as sourceMusic :
-                speak("What type of music Sir ?")
-                print("Recognizing song name...")
-                r.pause_threshold = 1
-                audioMusic = r.listen(sourceMusic)
-                try :
-                    queryMusic = str(r.recognize_google(audioMusic, language="en-UK"))
-                    print(queryMusic)
-                    playMusic(queryMusic)
-                except Exception as e:
-                    print(e)
-                    speak("Couldn't hear the song name  Sir !")
-                    voiceMusic()
+    speak("What type of music Sir ?")
+    print("Recognizing song name...")
+    r.pause_threshold = 1
+    audioMusic = r.listen(sourceMusic)
+    try :
+        queryMusic = str(r.recognize_google(audioMusic, language="en-UK"))
+        print(queryMusic)
+        kit.playonyt(queryMusic)
+    except Exception as e:
+        print(e)
+        speak("Couldn't hear the song name Sir !")
+        voiceMusic()
 
 def recog():
-
     with sr.Microphone() as source :
         print("Listening...")
         r.pause_threshold = 1
@@ -77,4 +73,5 @@ def recog():
     return query
 
 if __name__ == "__main__":
-    recog()
+    while(True):
+        recog()
