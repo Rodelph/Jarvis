@@ -5,8 +5,6 @@ import pywhatkit as kit
 import re
 
 engine = jarv.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
 r = sr.Recognizer()
 Time = datetime.datetime.now()
 
@@ -37,28 +35,28 @@ def greetingBack():
     speak("Greetings sir you seem cheerful today !")
 
 def voiceMusic():
- with sr.Microphone() as sourceMusic :
-                print("Recognizing song name...")
-                r.pause_threshold = 1
-                audioMusic = r.listen(sourceMusic)
+    with sr.Microphone() as sourceMusic :
+        print("Recognizing song name...")
+        r.pause_threshold = 1
+        audioMusic = r.listen(sourceMusic)
 
-                try :
-                    queryMusic = str(r.recognize_google(audioMusic, language="en-UK"))
-                    print(queryMusic)
-                    speak("Playing " + queryMusic + " !")
-                    kit.playonyt(queryMusic)
-                except Exception as e:
-                    print(e)
-                    speak("Couldn't hear the song name  Sir ! Could you repeat again ?")
-                    voiceMusic()
+        try :
+            queryMusic = str(r.recognize_google(audioMusic, language="en-UK"))
+            print(queryMusic)
+            speak("Playing " + queryMusic + " !")
+            kit.playonyt(queryMusic)
+        except Exception as e:
+            print(e)
+            speak("Couldn't hear the song name  Sir ! Could you repeat again ?")
+            voiceMusic()
 
 
 def sendMessageWtsp():
     minute = Time.minute + 1
-    kit.sendwhatmsg("+212632637463",
-                                    "Hello",
-                                    Time.hour, minute,
-                                    tab_close=True)
+    kit.sendwhatmsg("",
+                    "Hello",
+                    Time.hour, minute,
+                    tab_close=True)
 
 def searchVoice():
     with sr.Microphone() as sourceSearch :
