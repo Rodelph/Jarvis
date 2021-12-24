@@ -3,10 +3,44 @@ import datetime
 import speech_recognition as sr
 import pywhatkit as kit
 import re
+from bs4 import BeautifulSoup 
+import requests
+from pydub import AudioSegment
+from pydub.playback import play
 
+def playInitMusic():
+    sound = AudioSegment.from_wav('./music/init.wav')
+    play(sound)
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 engine = jarv.init()
 r = sr.Recognizer()
 Time = datetime.datetime.now()
+
+def weatherVoice():
+    with sr.Microphone() as sourceWeather: 
+        print("Recognizing the city...")
+        r.pause_threshold = 1
+        audioWeather = r.listen(sourceWeather)
+
+        try :
+            queryWeather = str(r.recognize_google(audioWeather, language="en-UK"))
+            print(queryWeather)
+            speak("Searching for " + queryWeather + "'s weather !")
+            weather(queryWeather + " weather")
+        except Exception as e:
+            print(e)
+            speak("Couldn't hear the city name correctly, could please repeat ?")
+            weatherVoice()
+
+def weather(city):
+    city = city.replace(" ", "+")
+    res = requests.get(f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8', headers=headers)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    location = soup.select('#wob_loc')[0].getText().strip()
+    info = soup.select('#wob_dc')[0].getText().strip()
+    weather = soup.select('#wob_tm')[0].getText().strip()
+    speak("The weather in "+ location + " is " + info + "and the temperature is " + weather+"°C")
 
 def searchGoogle(querySearch):
     kit.search(querySearch)
@@ -49,7 +83,6 @@ def voiceMusic():
             print(e)
             speak("Couldn't hear the song name  Sir ! Could you repeat again ?")
             voiceMusic()
-
 
 def sendMessageWtsp():
     minute = Time.minute + 1
@@ -96,6 +129,9 @@ def recog():
         if findWholeWord("time")(query.lower()) :
             time()
 
+        if findWholeWord("weather")(query.lower()):
+            weatherVoice()
+
         if findWholeWord("hello")(query.lower()):
             greetingBack()
 
@@ -115,6 +151,7 @@ def recog():
     return query
 
 if __name__ == "__main__":
+    playInitMusic()
     greeting()
     while(True):
         recog()
