@@ -10,6 +10,7 @@ from pydub.playback import play
 from extraPy.AudioAnalyzer import *
 import random
 import colorsys
+from time import process_time
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 engine = jarv.init()
@@ -21,6 +22,7 @@ def rnd_color():
     return [int(256 * i) for i in colorsys.hls_to_rgb(h, l, s)]
 
 def playInitMusic():
+    start = process_time()
     filename = './music/init.wav'
     analyzer = AudioAnalyzer()
     analyzer.load(filename)
@@ -59,23 +61,15 @@ def playInitMusic():
     length = 0
 
     for group in freq_groups:
-
         g = []
-
         s = group["stop"] - group["start"]
-
         count = group["count"]
-
         reminder = s%count
-
         step = int(s/count)
-
         rng = group["start"]
 
         for i in range(count):
-
             arr = None
-
             if reminder > 0:
                 reminder -= 1
                 arr = np.arange(start=rng, stop=rng + step + 2)
@@ -85,14 +79,11 @@ def playInitMusic():
                 rng += step + 2
 
             g.append(arr)
-
             length += 1
 
         tmp_bars.append(g)
 
-
     angle_dt = 360/length
-
     ang = 0
 
     for g in tmp_bars:
@@ -103,23 +94,17 @@ def playInitMusic():
             ang += angle_dt
 
         bars.append(gr)
-
-
     pygame.mixer.music.load(filename)
     pygame.mixer.music.play(0)
 
     running = True
     while running:
-
         avg_bass = 0
         poly = []
-
         t = pygame.time.get_ticks()
         deltaTime = (t - getTicksLastFrame) / 1000.0
         getTicksLastFrame = t
-
         timeCount += deltaTime
-
         screen.fill(circle_color)
 
         for event in pygame.event.get():
@@ -145,7 +130,6 @@ def playInitMusic():
                 polygon_bass_color = rnd_color()
             newr = min_radius + int(avg_bass * ((max_radius - min_radius) / (max_decibel - min_decibel)) + (max_radius - min_radius))
             radius_vel = (newr - radius) / 0.15
-
             polygon_color_vel = [(polygon_bass_color[x] - poly_color[x])/0.15 for x in range(len(poly_color))]
 
         elif radius > min_radius:
@@ -181,7 +165,10 @@ def playInitMusic():
         pygame.draw.circle(screen, circle_color, (circleX, circleY), int(radius))
 
         pygame.display.flip()
+        if process_time() - start >= 8:
+            break
 
+    pygame.display.quit()
     pygame.quit()
 
 def weatherVoice():
