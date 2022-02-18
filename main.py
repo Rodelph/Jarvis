@@ -80,7 +80,6 @@ def playInitMusic():
 
             g.append(arr)
             length += 1
-
         tmp_bars.append(g)
 
     angle_dt = 360/length
